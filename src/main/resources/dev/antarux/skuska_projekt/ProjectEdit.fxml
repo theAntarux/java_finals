@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox alignment="TOP_CENTER" prefHeight="420.0" prefWidth="580.0" spacing="12" style="-fx-padding: 20; -fx-background-color: #f9f9f9;" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="dev.antarux.skuska_projekt.ProjectEditController">
+
+    <Label style="-fx-font-size: 18; -fx-font-weight: bold;" text="Projekt" />
+
+    <HBox alignment="CENTER_LEFT" spacing="15">
+        <Label style="-fx-font-weight: bold;" text="Kľúč projektu:" />
+        <TextField fx:id="tfProjectKey" prefWidth="180" promptText="napr. SKUSKA-2025" />
+    </HBox>
+
+    <HBox alignment="CENTER_LEFT" spacing="15">
+        <Label style="-fx-font-weight: bold;" text="Názov projektu:" />
+        <TextField fx:id="tfName" prefWidth="380" promptText="Zadajte názov projektu" />
+    </HBox>
+
+    <Label style="-fx-font-weight: bold;" text="Popis:" />
+    <TextArea fx:id="taDescription" prefHeight="140" promptText="Detailný popis projektu..." wrapText="true" />
+
+    <CheckBox fx:id="chkActive" selected="true" text="Projekt je aktívny" />
+
+    <HBox alignment="CENTER" spacing="15" style="-fx-padding: 30 0 0 0;">
+        <Button fx:id="btnSave" onAction="#saveProject" prefWidth="120" styleClass="btn-success" text="Uložiť" />
+        <Button fx:id="btnDelete" onAction="#deleteProject" prefWidth="120" styleClass="btn-danger" text="Vymazať" visible="false" />
+        <Button fx:id="btnCancel" onAction="#closeWindow" prefWidth="120" styleClass="btn-secondary" text="Zrušiť" />
+    </HBox>
+
+</VBox>

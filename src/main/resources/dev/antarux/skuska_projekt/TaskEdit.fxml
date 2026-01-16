@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox alignment="TOP_CENTER" prefHeight="583.0" prefWidth="847.0" spacing="12" style="-fx-padding: 20; -fx-background-color: #f9f9f9;" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="dev.antarux.skuska_projekt.TaskEditController">
+    <HBox alignment="CENTER_LEFT" spacing="15">
+        <Label style="-fx-font-weight: bold;" text="Projekt:" />
+        <ComboBox fx:id="cbProject" prefWidth="280" promptText="Vyberte projekt" />
+        <Label style="-fx-font-weight: bold;" text="Priorita:" />
+        <ComboBox fx:id="cbPriority" prefWidth="140" />
+        <Label style="-fx-font-weight: bold;" text="Stav:" />
+        <ComboBox fx:id="cbStatus" prefWidth="140" />
+    </HBox>
+    <HBox alignment="CENTER_LEFT" spacing="15">
+        <Label style="-fx-font-weight: bold;" text="Názov úlohy:" />
+        <TextField fx:id="tfTitle" prefWidth="520" promptText="Zadajte názov úlohy" />
+    </HBox>
+    <Label style="-fx-font-weight: bold;" text="Popis:" />
+    <TextArea fx:id="taDescription" prefHeight="140" promptText="Detailný popis úlohy..." wrapText="true" />
+    <HBox alignment="CENTER" spacing="15">
+        <Label style="-fx-font-weight: bold;" text="Odhadovaný čas (hodiny):" />
+        <TextField fx:id="tfEstimatedHours" prefWidth="120" promptText="napr. 4.5" />
+    </HBox>
+    <HBox alignment="CENTER" spacing="20">
+        <VBox prefWidth="340" spacing="8">
+            <Label style="-fx-font-weight: bold;" text="Riešitelia" />
+            <HBox spacing="10">
+                <ComboBox fx:id="cbAvailableMembers" prefWidth="240" promptText="Vyberte člena" />
+                <Button fx:id="btnAddAssignee" onAction="#addAssignee" text="Pridať →" />
+            </HBox>
+            <ListView fx:id="lvAssignedMembers" prefHeight="180" />
+            <Button fx:id="btnRemoveAssignee" onAction="#removeAssignee" text="Odstrániť vybraných" />
+        </VBox>
+        <VBox prefWidth="340" spacing="8">
+            <Label style="-fx-font-weight: bold;" text="Tagy" />
+            <HBox spacing="10">
+                <ComboBox fx:id="cbAvailableTags" prefWidth="240" promptText="Vyberte tag" />
+                <Button fx:id="btnAddTag" onAction="#addTag" text="Pridať →" />
+            </HBox>
+            <ListView fx:id="lvAssignedTags" prefHeight="180" />
+            <Button fx:id="btnRemoveTag" onAction="#removeTag" text="Odstrániť vybrané tagy" />
+        </VBox>
+    </HBox>
+    <HBox alignment="CENTER" spacing="15" style="-fx-padding: 20 0 0 0;">
+        <Button fx:id="btnSave" onAction="#saveTask" prefWidth="120" styleClass="btn-success" text="Uložiť" />
+        <Button fx:id="btnDelete" onAction="#deleteTask" prefWidth="120" styleClass="btn-danger" text="Vymazať" />
+        <Button fx:id="btnCancel" onAction="#closeWindow" prefWidth="120" styleClass="btn-secondary" text="Zrušiť" />
+    </HBox>
+</VBox>

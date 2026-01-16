@@ -9,15 +9,15 @@
         <VBox>
             <ToolBar style="-fx-padding: 8;">
                 <items>
-                    <Button fx:id="btnNewTask" text="Nová úloha" styleClass="btn-primary"/>
-                    <Button fx:id="btnNewProject" text="Nový projekt" styleClass="btn-secondary"/>
+                    <Button fx:id="btnNewTask" text="Nová úloha" styleClass="btn-primary" onAction="#handleNewTask"/>
+                    <Button fx:id="btnNewProject" text="Nový projekt" styleClass="btn-secondary" onAction="#handleNewProject"/>
                     <Separator HBox.hgrow="ALWAYS"/>
                     <ComboBox fx:id="cbProjects" promptText="Všetky projekty" prefWidth="180"/>
                     <ComboBox fx:id="cbStatus" promptText="Všetky stavy" prefWidth="140"/>
                     <ComboBox fx:id="cbPriority" promptText="Všetky priority" prefWidth="140"/>
                     <TextField fx:id="tfSearch" promptText="Hľadať v názve / popise..." prefWidth="220"/>
-                    <Button fx:id="btnApplyFilter" text="Filtrovať" styleClass="btn-filter"/>
-                    <Button fx:id="btnClearFilter" text="Zrušiť filter" styleClass="btn-clear"/>
+                    <Button fx:id="btnApplyFilter" text="Filtrovať" styleClass="btn-filter" onAction="#applyFilters"/>
+                    <Button fx:id="btnClearFilter" text="Zrušiť filter" styleClass="btn-clear" onAction="#clearFilters"/>
                 </items>
             </ToolBar>
             <HBox alignment="CENTER_LEFT" style="-fx-padding: 6 12; -fx-background-color: #f5f5f5;">
@@ -30,7 +30,7 @@
     </top>
     <center>
         <StackPane>
-            <TableView fx:id="tasksTable" styleClass="table-view">
+            <TableView fx:id="tasksTable" styleClass="table-view" onMouseClicked="#handleTableClick">
                 <columns>
                     <TableColumn fx:id="colId" text="ID" prefWidth="55" sortable="true"/>
                     <TableColumn fx:id="colProject" text="Projekt" prefWidth="160" sortable="true"/>
