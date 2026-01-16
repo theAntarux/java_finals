@@ -12,7 +12,7 @@ import java.io.InputStream;
 public class Launcher extends Application {
     @Override public void start(Stage stage) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("MainApp.fxml"));
-        Scene scene = new Scene(fxmlLoader.load(), 700, 480);
+        Scene scene = new Scene(fxmlLoader.load(), 980, 620);
         stage.setTitle("Final-Project");
         stage.setScene(scene);
         stage.resizableProperty().setValue(false);
