@@ -18,7 +18,9 @@ import java.sql.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class MainController {
     @FXML private TableView<Task> tasksTable;
@@ -151,12 +153,12 @@ public class MainController {
     private void loadTasks() {
         allTasks.clear();
         String sql = """
-                SELECT t.*
-                FROM tasks t
-                JOIN projects p ON t.project_id = p.id
-                WHERE p.is_active = true
-                ORDER BY t.created_at DESC
-                """;
+            SELECT t.*
+            FROM tasks t
+            JOIN projects p ON t.project_id = p.id
+            WHERE p.is_active = true
+            ORDER BY t.created_at DESC
+            """;
 
         try (Connection conn = new Database().getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
@@ -171,81 +173,91 @@ public class MainController {
                 task.setPriority(Task.Priority.valueOf(rs.getString("priority")));
                 task.setStatus(Task.Status.valueOf(rs.getString("status")));
                 task.setEstimatedHours(rs.getDouble("estimated_hours"));
-                task.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
 
-                if (rs.getTimestamp("updated_at") != null)
-                    task.setUpdatedAt(rs.getTimestamp("updated_at").toLocalDateTime());
+                Timestamp ca = rs.getTimestamp("created_at");
+                if (ca != null) task.setCreatedAt(ca.toLocalDateTime());
 
-                if (rs.getTimestamp("closed_at") != null)
-                    task.setClosedAt(rs.getTimestamp("closed_at").toLocalDateTime());
+                Timestamp ua = rs.getTimestamp("updated_at");
+                if (ua != null) task.setUpdatedAt(ua.toLocalDateTime());
+
+                Timestamp cla = rs.getTimestamp("closed_at");
+                if (cla != null) task.setClosedAt(cla.toLocalDateTime());
 
                 task.setCreatedById(rs.getLong("created_by_id"));
 
                 allTasks.add(task);
             }
 
+            // Batch load assignees for all active tasks in one query
+            Map<Long, List<TeamMember>> assigneesByTask = new HashMap<>();
+            String sqlAssignees = """
+                SELECT ta.task_id, tm.id, tm.username, tm.full_name, tm.created_at
+                FROM task_assignees ta
+                JOIN team_members tm ON ta.member_id = tm.id
+                JOIN tasks t ON ta.task_id = t.id
+                JOIN projects p ON t.project_id = p.id
+                WHERE p.is_active = true
+                """;
+            try (Statement stmt = conn.createStatement();
+                 ResultSet rsAss = stmt.executeQuery(sqlAssignees)) {
+                while (rsAss.next()) {
+                    long taskId = rsAss.getLong("task_id");
+                    TeamMember m = new TeamMember();
+                    m.setId(rsAss.getLong("id"));
+                    m.setUsername(rsAss.getString("username"));
+                    m.setFullName(rsAss.getString("full_name"));
+                    Timestamp ts = rsAss.getTimestamp("created_at");
+                    if (ts != null) m.setCreatedAt(ts.toLocalDateTime());
+
+                    if (!assigneesByTask.containsKey(taskId)) {
+                        assigneesByTask.put(taskId, new ArrayList<>());
+                    }
+                    assigneesByTask.get(taskId).add(m);
+                }
+            }
+
+            // Batch load tags for all active tasks in one query
+            Map<Long, List<Tag>> tagsByTask = new HashMap<>();
+            String sqlTags = """
+                SELECT tt.task_id, tg.id, tg.name, tg.color_hex, tg.description
+                FROM task_tags tt
+                JOIN tags tg ON tt.tag_id = tg.id
+                JOIN tasks t ON tt.task_id = t.id
+                JOIN projects p ON t.project_id = p.id
+                WHERE p.is_active = true
+                """;
+            try (Statement stmt = conn.createStatement();
+                 ResultSet rsTags = stmt.executeQuery(sqlTags)) {
+                while (rsTags.next()) {
+                    long taskId = rsTags.getLong("task_id");
+                    Tag tag = new Tag();
+                    tag.setId(rsTags.getLong("id"));
+                    tag.setName(rsTags.getString("name"));
+                    tag.setColorHex(rsTags.getString("color_hex"));
+                    tag.setDescription(rsTags.getString("description"));
+
+                    if (!tagsByTask.containsKey(taskId)) {
+                        tagsByTask.put(taskId, new ArrayList<>());
+                    }
+                    tagsByTask.get(taskId).add(tag);
+                }
+            }
+
+            // Assign the batched data to each task
             for (Task task : allTasks) {
-                loadAssigneesForTask(task);
-                loadTagsForTask(task);
+                List<TeamMember> assignees = assigneesByTask.get(task.getId());
+                if (assignees != null) {
+                    task.getAssignees().addAll(assignees);
+                }
+
+                List<Tag> tags = tagsByTask.get(task.getId());
+                if (tags != null) {
+                    task.getTags().addAll(tags);
+                }
             }
 
         } catch (SQLException e) {
-            showError("Chyba pri načítaní úloh: " + e.getMessage());
-        }
-    }
-
-    private void loadAssigneesForTask(Task task) {
-        String sql = """
-                SELECT m.*
-                FROM team_members m
-                JOIN task_assignees a ON m.id = a.member_id
-                WHERE a.task_id = ?
-                """;
-
-        try (Connection conn = new Database().getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setLong(1, task.getId());
-            ResultSet rs = ps.executeQuery();
-
-            while (rs.next()) {
-                TeamMember m = new TeamMember();
-                m.setId(rs.getLong("id"));
-                m.setUsername(rs.getString("username"));
-                m.setFullName(rs.getString("full_name"));
-                m.setEmail(rs.getString("email"));
-                m.setRole(rs.getString("role"));
-                m.setActive(rs.getBoolean("active"));
-                m.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
-                task.getAssignees().add(m);
-            }
-        } catch (SQLException e) {
-            showError("Chyba pri načítaní riešiteľov: " + e.getMessage());
-        }
-    }
-
-    private void loadTagsForTask(Task task) {
-        String sql = """
-                SELECT tg.*
-                FROM tags tg
-                JOIN task_tags tt ON tg.id = tt.tag_id
-                WHERE tt.task_id = ?
-                """;
-
-        try (Connection conn = new Database().getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setLong(1, task.getId());
-            ResultSet rs = ps.executeQuery();
-
-            while (rs.next()) {
-                Tag t = new Tag();
-                t.setId(rs.getLong("id"));
-                t.setName(rs.getString("name"));
-                t.setColorHex(rs.getString("color_hex"));
-                t.setDescription(rs.getString("description"));
-                task.getTags().add(t);
-            }
-        } catch (SQLException e) {
-            showError("Chyba pri načítaní tagov: " + e.getMessage());
+            showError("Nepodarilo sa načítať úlohy: " + e.getMessage());
         }
     }
 
