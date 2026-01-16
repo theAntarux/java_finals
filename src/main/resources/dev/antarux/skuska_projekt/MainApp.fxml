@@ -1,16 +1,55 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.layout.VBox?>
-
-<?import javafx.scene.control.Button?>
-<VBox alignment="CENTER" spacing="20.0" xmlns:fx="http://javafx.com/fxml"
-      fx:controller="dev.antarux.skuska_projekt.MainController">
-    <padding>
-        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>
-    </padding>
-
-    <Label fx:id="welcomeText"/>
-    <Button text="Hello!" onAction="#onHelloButtonClick"/>
-</VBox>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<BorderPane xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="dev.antarux.skuska_projekt.MainController"
+            prefHeight="620.0" prefWidth="980.0">
+    <top>
+        <VBox>
+            <ToolBar style="-fx-padding: 8;">
+                <items>
+                    <Button fx:id="btnNewTask" text="Nová úloha" styleClass="btn-primary"/>
+                    <Button fx:id="btnNewProject" text="Nový projekt" styleClass="btn-secondary"/>
+                    <Separator HBox.hgrow="ALWAYS"/>
+                    <ComboBox fx:id="cbProjects" promptText="Všetky projekty" prefWidth="180"/>
+                    <ComboBox fx:id="cbStatus" promptText="Všetky stavy" prefWidth="140"/>
+                    <ComboBox fx:id="cbPriority" promptText="Všetky priority" prefWidth="140"/>
+                    <TextField fx:id="tfSearch" promptText="Hľadať v názve / popise..." prefWidth="220"/>
+                    <Button fx:id="btnApplyFilter" text="Filtrovať" styleClass="btn-filter"/>
+                    <Button fx:id="btnClearFilter" text="Zrušiť filter" styleClass="btn-clear"/>
+                </items>
+            </ToolBar>
+            <HBox alignment="CENTER_LEFT" style="-fx-padding: 6 12; -fx-background-color: #f5f5f5;">
+                <Label text="Aktívne projekty:" style="-fx-font-weight: bold;"/>
+                <Label fx:id="lblActiveProjectsCount" text="?" style="-fx-padding: 0 20 0 8;"/>
+                <Label text="Otvorené úlohy:" style="-fx-font-weight: bold;"/>
+                <Label fx:id="lblOpenTasksCount" text="?" style="-fx-padding: 0 20 0 8;"/>
+            </HBox>
+        </VBox>
+    </top>
+    <center>
+        <StackPane>
+            <TableView fx:id="tasksTable" styleClass="table-view">
+                <columns>
+                    <TableColumn fx:id="colId" text="ID" prefWidth="55" sortable="true"/>
+                    <TableColumn fx:id="colProject" text="Projekt" prefWidth="160" sortable="true"/>
+                    <TableColumn fx:id="colTitle" text="Názov úlohy" prefWidth="240" sortable="true"/>
+                    <TableColumn fx:id="colPriority" text="Priorita" prefWidth="100" sortable="true"/>
+                    <TableColumn fx:id="colStatus" text="Stav" prefWidth="110" sortable="true"/>
+                    <TableColumn fx:id="colAssignees" text="Riešitelia" prefWidth="160"/>
+                    <TableColumn fx:id="colTags" text="Tagy" prefWidth="140"/>
+                    <TableColumn fx:id="colCreated" text="Vytvorené" prefWidth="110" sortable="true"/>
+                    <TableColumn fx:id="colUpdated" text="Posledná zmena" prefWidth="110" sortable="true"/>
+                </columns>
+            </TableView>
+            <ProgressIndicator fx:id="loadingIndicator" visible="false" progress="-1.0" prefWidth="70.0" prefHeight="70.0"/>
+        </StackPane>
+    </center>
+    <bottom>
+        <HBox alignment="CENTER" style="-fx-padding: 12;">
+            <Pagination fx:id="pagination" pageCount="1" currentPageIndex="0" maxPageIndicatorCount="9"/>
+            <Label fx:id="lblPageInfo" text="Strana 1 / 1   |   Zobrazených 0 záznamov" style="-fx-padding: 0 0 0 30;"/>
+        </HBox>
+    </bottom>
+</BorderPane>

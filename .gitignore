@@ -3,7 +3,7 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 .kotlin
-.env
+src/main/java/dev/antarux/skuska_projekt/.env
 
 ### IntelliJ IDEA ###
 .idea/modules.xml
