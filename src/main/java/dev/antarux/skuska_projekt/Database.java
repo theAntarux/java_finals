@@ -13,9 +13,14 @@ public class Database {
     private final static String database = "java_skuska";
     private final static String username = "DB_ACCESS";
 
-    // Returns password very safely, basically slovak safety level
-    private String getPassword() {
-        String password = "";
+    private static String password = null;  // Cache the password
+
+    private static String getPassword() {
+        if (password != null) {
+            return password;
+        }
+
+        password = "";  // Default to empty
 
         try {
             FileReader file = new FileReader(".env");
@@ -28,7 +33,7 @@ public class Database {
 
             reader.close();
             file.close();
-        } catch (IOException err){
+        } catch (IOException err) {
             System.err.println(err);
         }
 
@@ -39,12 +44,9 @@ public class Database {
         return password;
     }
 
-    /*
-        Returns active database connection for CRUD operations
-        App should ideally use restful API endpoints for crud operations tho
-     */
-    public Connection getConnection() throws SQLException {
+    public static Connection getConnection() throws SQLException {
+        // Removed: System.out.println(getPassword());  // No more printing!
         String url = "jdbc:mysql://" + ip + ":" + port + "/" + database;
-        return DriverManager.getConnection(url, username, this.getPassword());
+        return DriverManager.getConnection(url, username, getPassword());
     }
 }
